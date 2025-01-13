@@ -1,14 +1,15 @@
 const express = require("express");
-const { Client } = require("pg"); // Importamos el cliente PostgreSQL
+const { Client } = require("pg");
 const app = express();
 const port = 3000;
 
-// Configuración de conexión con la base de datos de Render
+// Configurar la conexión con PostgreSQL usando la URL de Render
 const client = new Client({
-  connectionString: "postgresql://root:djc2i8imh1YH0GJR2R42IVobfscCb4W7@dpg-cu25qhd6l47c73a99hm0-a/cne_3dwv"
+  connectionString: "postgresql://root:djc2i8imh1YH0GJR2R42IVobfscCb4W7@dpg-cu25qhd6l47c73a99hm0-a/cne_3dwv",
+  ssl: { rejectUnauthorized: false }, // Esto es necesario para conexiones seguras en algunos servicios como Render.
 });
 
-// Conectar con la base de datos PostgreSQL
+// Intentamos conectar a la base de datos
 client.connect()
   .then(() => {
     console.log("Conectado a la base de datos PostgreSQL en Render");
@@ -17,12 +18,13 @@ client.connect()
     console.error("Error al conectar con la base de datos:", err);
   });
 
-// Ruta principal para obtener los usuarios
+// Definir la ruta principal
 app.get("/", (req, res) => {
-  const query = "SELECT * FROM usuarios"; // Consulta para obtener todos los usuarios
+  const query = "SELECT * FROM usuarios";  // Cambiar nombre de la tabla si es diferente
+
   client.query(query)
     .then(result => {
-      res.json(result.rows); // Enviar los usuarios como respuesta en formato JSON
+      res.json(result.rows);  // Responder con los datos de los usuarios
     })
     .catch(err => {
       res.status(500).send("Error al obtener los usuarios: " + err.message);
